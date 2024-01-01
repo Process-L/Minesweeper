@@ -6,6 +6,7 @@ data	segment
 	pox		db 0
 	poy		db 0
 	snum	db 0
+	seeds	db 28,29,31,32,37,38,41,43,44,46,47,49,52,53,56,58,59,61,62,64,67,71,73,74,76,77,79,82,83,86,88,89,91,92,94,97,98,101,103,104,106,107,109,112,113,116,118,121,122,124
 	msgt	db 'Mine Sweeping',0
 	wint	db 'YOU WIN',0
 	loset	db 'YOU FAILED',0
@@ -132,24 +133,42 @@ code	segment
 		push si
 		push cx
 		push dx
+		mov si,offset seeds
+		mov ah,2ch
+		int 21h
+		xor ah,ah
+		mov al,dl
+		mov cl,50
+		div cl
+		mov al,ah
+		xor ah,ah
+		add si,ax
+		mov al,ds:[si]
+		mov bx,ax
 		mov si,offset minel
 		mov cx,10
 		pl:
 			push cx
-			mov ah,2ch
-			int 21h
-			xor ah,ah
-			mov al,dl
-			mov bx,ax
+			mul bx
+			add ax,bx
+			push ax
+			push bx
+			mov bx,97
+			xor dx,dx
+			div bx
+			mov bx,dx
 			shl bx,1
 			cmp byte ptr ds:[si+bx+24+1],1
 			jne rl
 			mov byte ptr ds:[si+bx+24+1],2
-			mov ax,dx
+			pop ax
+			pop bx
 			pop cx
 			loop pl
 			jmp prt
 			rl:
+				pop ax
+				pop bx
 				pop cx
 				inc cx
 				loop pl
